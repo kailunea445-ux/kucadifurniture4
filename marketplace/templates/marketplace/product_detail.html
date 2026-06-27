@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block content %}
+{% if messages %}
+<div class="fixed top-24 right-5 z-50 space-y-3 max-w-sm">
+    {% for message in messages %}
+    <div class="flex items-center gap-3 p-4 rounded-xl shadow-lg border text-xs font-semibold tracking-wide backdrop-blur-md transition-all duration-300 animate-fade-in
+        {% if message.tags == 'error' %} bg-red-50/95 text-red-700 border-red-200 {% else %} bg-green-50/95 text-green-700 border-green-200 {% endif %}">
+        
+        {% if message.tags == 'error' %}
+            <i class="fas fa-exclamation-circle text-lg text-red-500"></i>
+        {% else %}
+            <i class="fas fa-check-circle text-lg text-green-500"></i>
+        {% endif %}
+        
+        <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <a href="{% url 'katalog' %}" class="text-sm text-gray-600 hover:text-charcoal mb-6 inline-block">&larr; Kembali ke Katalog</a>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
+            <div class="flex items-center justify-center">
+                <div class="w-full max-w-2xl">
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const wishlistButton = document.getElementById('wishlist-toggle');
+    if (!wishlistButton) return;
+
+    wishlistButton.addEventListener('click', async function() {
+        const url = this.dataset.url;
+        const productId = this.dataset.productId || '{{ product.id }}';
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ product_id: productId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                const icon = this.querySelector('i');
+                if (data.liked) {
+                    this.classList.add('bg-amber-100', 'text-red-600');
+                    this.classList.remove('bg-[#fff6f0]', 'text-amber-700');
+                    if (icon) icon.className = 'fas fa-heart';
+                    this.setAttribute('aria-pressed', 'true');
+                } else {
+                    this.classList.remove('bg-amber-100', 'text-red-600');
+                    this.classList.add('bg-[#fff6f0]', 'text-amber-700');
+                    if (icon) icon.className = 'far fa-heart';
+                    this.setAttribute('aria-pressed', 'false');
+                }
+            }
+        } catch (error) {
+            console.error('Wishlist toggle error', error);
+        }
+    });
+});
+</script>
+                    <div class="bg-[#f8f7f3] rounded-lg overflow-hidden border border-gray-100">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-[520px] object-cover sm:h-[420px] md:h-[480px] transition-transform duration-500 hover:scale-105">
+                        {% else %}
+                            <div class="w-full h-[520px] sm:h-[420px] md:h-[480px] flex items-center justify-center text-gray-300">
+                                <span class="text-8xl font-serif">🪑</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-4 flex items-center gap-3">
+                        <div class="w-20 h-16 bg-[#faf8f5] border border-gray-100 rounded-lg flex items-center justify-center text-gray-300">1</div>
+                        <div class="w-20 h-16 bg-[#faf8f5] border border-gray-100 rounded-lg flex items-center justify-center text-gray-300">2</div>
+                        <div class="w-20 h-16 bg-[#faf8f5] border border-gray-100 rounded-lg flex items-center justify-center text-gray-300">3</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-2 md:py-4">
+                <h1 class="text-3xl md:text-4xl font-serif font-black text-[#232323] leading-tight mb-3">{{ product.name }}</h1>
+
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="text-lg md:text-xl font-mono font-bold text-[#232323]">
+                            Rp {{ product.price|intcomma }}
+                        </div>
+
+                        {% if product.stock and product.stock > 0 %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800 font-semibold">Stok Tersedia ({{ product.stock }})</span>
+                        {% else %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-100 text-red-800 font-semibold">Stok Habis</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        {% if user.is_authenticated %}
+                        <button id="wishlist-toggle" type="button" data-url="{% url 'toggle_wishlist' %}" data-product-id="{{ product.id }}" aria-label="Tambah ke Wishlist" aria-pressed="{% if is_wishlisted %}true{% else %}false{% endif %}" class="p-2 rounded-md transition border border-amber-100 hover:bg-amber-50 {% if is_wishlisted %}bg-amber-100 text-red-600{% else %}bg-[#fff6f0] text-amber-700{% endif %}">
+                            <i class="{% if is_wishlisted %}fas fa-heart{% else %}far fa-heart{% endif %}"></i>
+                        </button>
+                        {% else %}
+                        <a href="{% url 'account_login' %}?next={{ request.path }}" class="p-2 rounded-md bg-[#fff6f0] text-amber-700 border border-amber-100 hover:bg-amber-50 transition">
+                            <i class="far fa-heart"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <p class="text-sm text-gray-600 leading-relaxed mb-6">
+                    {% if product.description %}
+                        {{ product.description }}
+                    {% else %}
+                        <em class="text-gray-400">Deskripsi produk belum tersedia.</em>
+                    {% endif %}
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                    <div class="bg-[#fcfbf9] border border-gray-100 rounded-lg p-4">
+                        <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Spesifikasi Massa</div>
+                        <div class="text-sm font-semibold text-gray-800">{{ product.weight }} kg</div>
+                    </div>
+
+                    <div class="bg-[#fcfbf9] border border-gray-100 rounded-lg p-4">
+                        <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Dimensi Volume</div>
+                        <div class="text-sm font-semibold text-gray-800">{{ product.dimensions }}</div>
+                    </div>
+                </div>
+
+                <form action="{% url 'add_to_cart' product.id %}" method="POST" class="w-full">
+                    {% csrf_token %}
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center border border-gray-200 rounded-md overflow-hidden">
+                                <button type="button" id="qty-decrease" class="px-3 py-2 bg-white text-gray-600 hover:bg-gray-50">−</button>
+                                <input id="qty" name="quantity" type="text" value="1" readonly class="w-12 text-center px-3 py-2 bg-white text-sm font-medium">
+                                <button type="button" id="qty-increase" class="px-3 py-2 bg-white text-gray-600 hover:bg-gray-50">+</button>
+                            </div>
+
+                            <div class="text-sm text-gray-500">Stok: <span class="font-semibold text-gray-700">{{ product.stock }}</span></div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                {% if not request.user.is_superuser and not request.user.is_staff %}
+                                    {% if user.is_authenticated %}
+                                        <button type="submit" id="add-to-cart" class="bg-[#8c6239] hover:bg-[#754f35] text-white px-6 py-3 rounded-md font-semibold shadow-sm transition disabled:opacity-50" {% if not product.stock or product.stock == 0 %}disabled{% endif %}>
+                                            Tambah ke Keranjang
+                                        </button>
+                                        <a href="{% url 'buy_now' product.id %}" class="bg-charcoal hover:bg-[#111111] text-white px-6 py-3 rounded-md font-semibold shadow-sm transition inline-block {% if not product.stock or product.stock == 0 %}pointer-events-none opacity-50{% endif %}">
+                                            Beli Langsung
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'account_login' %}?next={{ request.path }}" class="bg-[#8c6239] hover:bg-[#754f35] text-white px-6 py-3 rounded-md font-semibold shadow-sm transition inline-block text-center {% if not product.stock or product.stock == 0 %}pointer-events-none opacity-50{% endif %}">
+                                            Tambah ke Keranjang
+                                        </a>
+                                        <a href="{% url 'account_login' %}?next={{ request.path }}" class="bg-charcoal hover:bg-[#111111] text-white px-6 py-3 rounded-md font-semibold shadow-sm transition inline-block text-center {% if not product.stock or product.stock == 0 %}pointer-events-none opacity-50{% endif %}">
+                                            Beli Langsung
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="text-sm text-red-600">Akses Admin: Anda berada dalam mode pratinjau toko.</p>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'katalog' %}" class="text-sm text-gray-600 hover:underline">Lanjut Belanja</a>
+                        </div>
+                        
+                    </div>
+                </form>
+
+                <div class="mt-6 text-xs text-gray-500 space-y-2">
+                    <div>Garansi: 1 Tahun</div>
+                    <div>Pengiriman: Estimasi 3-7 hari kerja</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const dec = document.getElementById('qty-decrease');
+    const inc = document.getElementById('qty-increase');
+    const input = document.getElementById('qty');
+    const addBtn = document.getElementById('add-to-cart');
+    const stock = parseInt("{{ product.stock|default:0 }}", 10) || 0;
+
+    dec && dec.addEventListener('click', () => {
+        let v = parseInt(input.value, 10) || 1;
+        if (v > 1) input.value = v - 1;
+    });
+
+    inc && inc.addEventListener('click', () => {
+        let v = parseInt(input.value, 10) || 1;
+        if (v < stock) input.value = v + 1;
+    });
+
+    if (addBtn && stock === 0) {
+        addBtn.setAttribute('disabled', 'disabled');
+    }
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+{% endblock %}

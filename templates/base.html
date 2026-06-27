@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Kucadi Furniture - Premium Smart Living{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700&family=Playfair+Display:ital,wght=0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        charcoal: '#232323',
+                        cream: '#fdfbf7',
+                        sand: '#f4f0ea',
+                        accent: '#8c6239',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#F9F6F0] text-[#222222] font-sans antialiased">
+
+    <div class="bg-[#222222] text-white text-center py-2 text-xs tracking-widest font-medium">
+        <p>KUCADI SMART LIVING: Furnitur Ergonomis & Alat Kebugaran Rumahan — Gratis Ongkir Seluruh Indonesia</p>
+    </div>
+
+    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b h-20 px-6 md:px-12 flex items-center justify-center">
+        <div class="w-full max-w-7xl flex items-center justify-between relative h-full">
+            
+            <div class="hidden lg:flex items-center space-x-6 justify-start flex-1 h-full">
+                <div class="group h-full flex items-center">
+                    <a href="{% url 'katalog' %}?category=furnitur-tidur" class="text-[11px] font-bold tracking-widest text-neutral-700 hover:text-amber-700 transition whitespace-nowrap h-full flex items-center border-b-2 border-transparent group-hover:border-amber-700">FURNITUR & TIDUR</a>
+                    <div class="absolute top-20 left-0 w-full bg-white border-b shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50 p-8 grid grid-cols-4 gap-8">
+                        <div class="col-span-1 border-r pr-6">
+                            <h4 class="text-xs font-black tracking-wider text-neutral-400 uppercase mb-4">Belanja Kategori</h4>
+                            <ul class="space-y-3 text-xs font-bold text-neutral-700">
+                                <li><a href="{% url 'katalog' %}?category=kursi-kerja-ergonomis" class="hover:text-amber-700 transition block">Kursi Kerja Ergonomis</a></li>
+                                <li><a href="{% url 'katalog' %}?category=meja-adjustable" class="hover:text-amber-700 transition block">Meja Adjustable (Smart Desk)</a></li>
+                                <li><a href="{% url 'katalog' %}?category=sofa-modular" class="hover:text-amber-700 transition block">Sofa Modular Lipat</a></li>
+                                <li><a href="{% url 'katalog' %}?category=kasur-ortopedik" class="hover:text-amber-700 transition block">Kasur & Ranjang Pintar</a></li>
+                                <li class="pt-2 border-t"><a href="{% url 'katalog' %}?category=furnitur-tidur" class="text-amber-700 hover:underline block text-[11px]">Lihat Semua Furnitur →</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-span-3 grid grid-cols-2 gap-4">
+                            <div class="relative overflow-hidden rounded-lg group/item bg-neutral-100 h-44">
+                                <img src="{% static 'marketplace/images/hero-furniture.jpg.png' %}" class="w-full h-full object-cover group-hover/item:scale-105 transition duration-500 opacity-90">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent p-4 flex flex-col justify-end">
+                                    <span class="text-white font-black text-xs tracking-wider">KOLEKSI KERJA SEHAT</span>
+                                    <span class="text-white/80 text-[10px] hover:underline cursor-pointer">Lihat Kursi & Meja Kerja →</span>
+                                </div>
+                            </div>
+                            <div class="relative overflow-hidden rounded-lg group/item bg-neutral-200 h-44">
+                                <div class="p-6 flex flex-col justify-between h-full bg-amber-50">
+                                    <div>
+                                        <h5 class="font-black text-neutral-800 text-sm tracking-wide">Garansi Kenyamanan 100 Hari</h5>
+                                        <p class="text-neutral-500 text-[11px] mt-1">Coba kasur ortopedik premium Kucadi di rumah. Tidak cocok? Uang kembali tanpa ribet.</p>
+                                    </div>
+                                    <a href="{% url 'katalog' %}?category=kasur-ortopedik" class="text-xs font-bold text-amber-700 hover:underline">Pelajari Selengkapnya →</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="group h-full flex items-center">
+                    <a href="{% url 'katalog' %}?category=penyimpanan" class="text-[11px] font-bold tracking-widest text-neutral-700 hover:text-amber-700 transition whitespace-nowrap h-full flex items-center border-b-2 border-transparent group-hover:border-amber-700">PENYIMPANAN</a>
+                    <div class="absolute top-20 left-0 w-full bg-white border-b shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50 p-8 grid grid-cols-4 gap-8">
+                        <div class="col-span-1 border-r pr-6">
+                            <h4 class="text-xs font-black tracking-wider text-neutral-400 uppercase mb-4">Solusi Ruang Rapi</h4>
+                            <ul class="space-y-3 text-xs font-bold text-neutral-700">
+                                <li><a href="{% url 'katalog' %}?category=kabinet-tv" class="hover:text-amber-700 transition block">Kabinet TV & Media Console</a></li>
+                                <li><a href="{% url 'katalog' %}?category=rak-modular" class="hover:text-amber-700 transition block">Rak Buku Modular</a></li>
+                                <li><a href="{% url 'katalog' %}?category=sideboard" class="hover:text-amber-700 transition block">Lemari Samping (Sideboard)</a></li>
+                                <li class="pt-2 border-t"><a href="{% url 'katalog' %}?category=penyimpanan" class="text-amber-700 hover:underline block text-[11px]">Lihat Semua Produk →</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-span-3 bg-neutral-50 p-6 rounded-lg flex items-center justify-between">
+                            <div class="max-w-md">
+                                <span class="bg-neutral-800 text-white text-[9px] font-black px-2 py-0.5 rounded tracking-widest uppercase">Desain Minimalis</span>
+                                <h5 class="font-black text-neutral-800 text-base mt-2">Sistem Penyimpanan Cerdas & Tersembunyi</h5>
+                                <p class="text-neutral-500 text-xs mt-1">Dibuat khusus untuk menyembunyikan kabel elektronik dan menghemat space ruang tamu apartemen Anda.</p>
+                            </div>
+                            <a href="{% url 'katalog' %}?category=penyimpanan" class="bg-neutral-800 text-white text-xs font-bold px-4 py-2.5 rounded hover:bg-neutral-700 transition tracking-widest">JELAJAHI RAK MODULAR</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="group h-full flex items-center">
+                    <a href="{% url 'katalog' %}?category=fitnes-rumahan" class="text-[11px] font-bold tracking-widest text-neutral-700 hover:text-amber-700 transition whitespace-nowrap h-full flex items-center border-b-2 border-transparent group-hover:border-amber-700">FITNES RUMAHAN</a>
+                    <div class="absolute top-20 left-0 w-full bg-white border-b shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50 p-8 grid grid-cols-4 gap-8">
+                        <div class="col-span-1 border-r pr-6">
+                            <h4 class="text-xs font-black tracking-wider text-neutral-400 uppercase mb-4">Gaya Hidup Aktif</h4>
+                            <ul class="space-y-3 text-xs font-bold text-neutral-700">
+                                <li><a href="{% url 'katalog' %}?category=treadmill" class="hover:text-amber-700 transition block">Treadmill Lipat Pintar</a></li>
+                                <li><a href="{% url 'katalog' %}?category=sepeda-statis" class="hover:text-amber-700 transition block">Sepeda Statis AI</a></li>
+                                <li><a href="{% url 'katalog' %}?category=dumbbell" class="hover:text-amber-700 transition block">Set Dumbbell Minimalis</a></li>
+                                <li class="pt-2 border-t"><a href="{% url 'katalog' %}?category=fitnes-rumahan" class="text-amber-700 hover:underline block text-[11px]">Lihat Semua Alat Fitnes →</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-span-3 grid grid-cols-2 gap-4">
+                            <div class="bg-amber-700 text-white p-6 rounded-lg flex flex-col justify-between">
+                                <div>
+                                    <h5 class="text-base font-black tracking-wide">Kucadi Active+ App</h5>
+                                    <p class="text-amber-100 text-xs mt-1">Setiap pembelian alat olahraga otomatis mendapatkan gratis langganan aplikasi kelas workout personal selama 1 tahun.</p>
+                                </div>
+                                <span class="text-xs font-bold underline cursor-pointer">Download Aplikasi di iOS & Android</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="group h-full flex items-center">
+                    <a href="{% url 'bestseller' %}" class="text-[11px] font-bold tracking-widest text-neutral-700 hover:text-amber-700 transition whitespace-nowrap h-full flex items-center border-b-2 border-transparent group-hover:border-amber-700">BESTSELLERS</a>
+                </div>
+
+            </div>
+
+            <div class="flex items-center justify-center flex-shrink-0 px-6 z-10">
+                <a href="{% url 'katalog' %}" class="flex items-center">
+                    <img src="{% static 'marketplace/images/logo_kucadi.png' %}" alt="Logo Kucadi Resmi" class="h-7 md:h-8 object-contain block m-0 p-0">
+                </a>
+            </div>
+
+            <div class="flex items-center space-x-4 justify-end flex-1 text-neutral-700 z-10">
+                <form method="GET" action="{% url 'katalog' %}" class="flex items-center border border-gray-200 rounded-full overflow-hidden bg-[#f8f5ef] max-w-xs">
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ request.GET.q|default:'' }}"
+                        placeholder="Cari produk..."
+                        class="px-4 py-2 text-sm text-[#222222] bg-transparent focus:outline-none"
+                    />
+                    <button type="submit" class="px-4 text-[#222222] hover:text-amber-700 transition">
+                        <i class="fas fa-search fa-fw"></i>
+                    </button>
+                </form>
+                <a href="{% url 'wishlist' %}" class="hover:text-amber-700 text-lg transition" title="Wishlist">
+                    <i class="far fa-heart fa-fw"></i>
+                </a>
+    
+    {% if user.is_authenticated %}
+    <a href="{% url 'order_history' %}" class="flex items-center hover:text-amber-700 transition space-x-1" title="Pesanan Saya">
+        <i class="fas fa-box-open fa-fw text-lg"></i>
+        <span class="text-[11px] font-bold tracking-widest hidden sm:inline whitespace-nowrap">PESANAN SAYA</span>
+    </a>
+    {% endif %}
+
+    {% if user.is_staff %}
+    <a href="/admin/" target="_blank" class="flex items-center text-amber-700 border border-amber-700/30 bg-amber-50 px-2 py-1 rounded-md hover:bg-amber-700 hover:text-white transition space-x-1">
+        <i class="fas fa-user-shield fa-fw text-sm"></i>
+        <span class="text-[10px] font-black tracking-widest whitespace-nowrap">ADMIN PANEL</span>
+    </a>
+    {% endif %}
+    
+    {% if user.is_authenticated %}
+    <a href="{% url 'account_logout' %}" class="flex items-center hover:text-red-600 transition space-x-1" title="Log Out">
+        <i class="fas fa-sign-out-alt fa-fw text-lg"></i>
+        <span class="text-[11px] font-bold tracking-widest hidden sm:inline whitespace-nowrap">KELUAR</span>
+    </a>
+    {% else %}
+    <a href="{% url 'account_login' %}" class="flex items-center hover:text-amber-700 transition space-x-1">
+        <i class="far fa-user fa-fw text-lg"></i>
+        <span class="text-[11px] font-bold tracking-widest hidden sm:inline whitespace-nowrap">MASUK</span>
+    </a>
+    {% endif %}
+    
+    <a href="{% url 'cart_detail' %}" class="relative hover:text-amber-700 transition flex items-center" title="Keranjang Belanja">
+        <i class="fas fa-shopping-bag fa-fw text-lg"></i>
+        <span class="absolute -top-2 -right-2 bg-amber-700 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold shadow-sm">
+            {{ total_cart_items|default:0 }}
+        </span>
+    </a>
+
+</div>
+
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-charcoal text-gray-400 text-xs py-16 px-6 md:px-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+            <div class="space-y-3">
+                <span class="text-lg font-serif font-bold text-white tracking-wider">KUCADI.</span>
+                <p class="text-gray-500 leading-relaxed font-light">Pelopor platform e-commerce Direct-to-Consumer khusus untuk production furnitur modular kontemporer berskala nasional.</p>
+            </div>
+            <div>
+                <h5 class="text-white font-semibold uppercase tracking-wider mb-4 text-[11px]">Kategori Produk</h5>
+                <ul class="space-y-2.5 font-light">
+                    <li><a href="{% url 'katalog' %}?category=sofa-modular" class="hover:text-white transition">Sofa Modular</a></li>
+                    <li><a href="{% url 'katalog' %}?category=meja-adjustable" class="hover:text-white transition">Meja Kayu Jati</a></li>
+                    <li><a href="{% url 'katalog' %}?category=kursi-kerja-ergonomis" class="hover:text-white transition">Kursi Kerja Ergonomis</a></li>
+                    <li><a href="{% url 'katalog' %}?category=penyimpanan" class="hover:text-white transition">Rak Penyimpanan</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-white font-semibold uppercase tracking-wider mb-4 text-[11px]">Layanan Pelanggan</h5>
+                <ul class="space-y-2.5 font-light">
+                    <li><a href="{% url 'helpdesk' %}" class="hover:text-white transition">Pengajuan Klaim E-Warranty</a></li>
+                    <li><a href="{% url 'order_history' %}" class="hover:text-white transition">Lacak Pengiriman Kargo</a></li>
+                    <li><a href="{% url 'panduan_rakit' %}" class="hover:text-white transition">Panduan Perakitan Mandiri</a></li>
+                    <li><a href="{% url 'helpdesk' %}" class="hover:text-white transition">Kontak Helpdesk 24/7</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-white font-semibold uppercase tracking-wider mb-4 text-[11px]">Kepatuhan Hukum</h5>
+                <p class="text-gray-500 leading-relaxed font-light mb-2">Sistem operasional keuangan dan proteksi privasi dilindungi enkripsi satu arah permanen.</p>
+                <span class="text-[10px] text-gray-600 font-mono block">Purwokerto, Jawa Tengah, Indonesia</span>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 text-gray-500 font-light">
+            <p>© 2026 Kucadi Furniture Group. Seluruh Hak Cipta Dilindungi Undang-Undang.</p>
+            <div class="flex space-x-6 text-[11px]">
+                <a href="#" class="hover:text-white transition">Terms of Service</a>
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

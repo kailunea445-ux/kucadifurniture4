@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="bg-white rounded-xl shadow-sm p-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-3xl font-serif font-black text-[#232323] mb-2">Detail Pesanan</h1>
+                <p class="text-sm text-gray-500">Nomor Pesanan <span class="font-semibold text-charcoal">{{ order.invoice_number }}</span></p>
+            </div>
+            <div class="text-right">
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-sm font-semibold text-gray-700">Status: {{ order.status|title }}</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+            <div class="lg:col-span-2 space-y-4">
+                <div class="bg-[#faf8f5] rounded-2xl p-6 border border-gray-100">
+                    <h2 class="text-sm uppercase tracking-[0.4em] text-gray-500 mb-4">Rincian Produk</h2>
+                    <div class="space-y-4">
+                        {% for item in items %}
+                        <div class="grid grid-cols-1 sm:grid-cols-6 gap-4 bg-white rounded-xl p-4 border border-gray-100">
+                            <div class="sm:col-span-1">
+                                <img src="{% if item.product.image %}{{ item.product.image.url }}{% else %}{% static 'marketplace/images/placeholder.png' %}{% endif %}" alt="{{ item.product.name }}" class="w-full h-24 object-cover rounded-lg">
+                            </div>
+                            <div class="sm:col-span-3 flex flex-col justify-center">
+                                <h3 class="font-semibold text-charcoal">{{ item.product.name }}</h3>
+                                <p class="text-sm text-gray-500 mt-1">Jumlah: {{ item.quantity }}</p>
+                            </div>
+                            <div class="sm:col-span-2 text-right flex flex-col justify-center">
+                                <span class="text-sm text-gray-500">Harga Satuan</span>
+                                <span class="text-lg font-semibold">Rp {{ item.price_per_unit|intcomma }}</span>
+                                <span class="text-sm text-gray-500 mt-2">Subtotal</span>
+                                <span class="font-semibold">Rp {{ item.subtotal|intcomma }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <aside class="space-y-4">
+                <div class="bg-[#faf8f5] rounded-2xl p-6 border border-gray-100">
+                    <h2 class="text-sm uppercase tracking-[0.4em] text-gray-500 mb-4">Ringkasan Pembayaran</h2>
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Produk ({{ total_items }} item)</span>
+                            <span>Rp {{ order.total_amount|intcomma }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Ongkos Kirim</span>
+                            <span>Rp {{ order.shipping_cost|intcomma }}</span>
+                        </div>
+                        <div class="flex justify-between font-semibold text-charcoal border-t border-gray-200 pt-3">
+                            <span>Total Bayar</span>
+                            <span>Rp {{ order.grand_total|intcomma }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-gray-100">
+                    <h2 class="text-sm uppercase tracking-[0.4em] text-gray-500 mb-4">Detail Pengiriman</h2>
+                    <div class="text-sm text-gray-600 space-y-2">
+                        <div><span class="font-semibold text-gray-800">Nama:</span> {{ order.shipping_name }}</div>
+                        <div><span class="font-semibold text-gray-800">Telepon:</span> {{ order.phone }}</div>
+                        <div><span class="font-semibold text-gray-800">Provinsi:</span> {{ order.province }}</div>
+                        <div><span class="font-semibold text-gray-800">Kota:</span> {{ order.city }}</div>
+                        <div><span class="font-semibold text-gray-800">Kecamatan:</span> {{ order.district }}</div>
+                        <div><span class="font-semibold text-gray-800">Kode Pos:</span> {{ order.postal_code }}</div>
+                        <div><span class="font-semibold text-gray-800">Kurir:</span> {{ order.courier }}</div>
+                        <div><span class="font-semibold text-gray-800">Alamat Lengkap:</span></div>
+                        <p class="text-gray-600">{{ order.address_full }}</p>
+                        <div><span class="font-semibold text-gray-800">Catatan Alamat:</span></div>
+                        <p class="text-gray-600">{{ order.shipping_address }}</p>
+                        <div><span class="font-semibold text-gray-800">Koordinat:</span> {{ order.latitude }}, {{ order.longitude }}</div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="window.print()" class="w-full bg-charcoal hover:bg-[#111111] text-white px-4 py-3 rounded-md font-semibold">Cetak Bukti Pembelian</button>
+                    {% if order.status == 'pending' and midtrans_client_key %}
+                        <button id="btn-bayar-sekarang" class="w-full bg-amber-500 hover:bg-amber-600 text-white px-4 py-3 rounded-md font-semibold">Bayar Sekarang</button>
+                    {% endif %}
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    body {
+        background: white;
+    }
+    nav, header, footer, .no-print {
+        display: none !important;
+    }
+    .print-container {
+        box-shadow: none !important;
+        border: none !important;
+    }
+}
+</style>
+
+{% if order.status == 'pending' and midtrans_client_key %}
+{% if midtrans_is_production %}
+<script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ midtrans_client_key }}"></script>
+{% else %}
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ midtrans_client_key }}"></script>
+{% endif %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const payButton = document.getElementById('btn-bayar-sekarang');
+    if (!payButton) return;
+
+    payButton.addEventListener('click', function () {
+        if (!window.snap) {
+            alert('Midtrans Snap belum dimuat. Silakan muat ulang halaman.');
+            return;
+        }
+
+        const snapToken = '{{ order.midtrans_token|default:""|escapejs }}';
+        if (!snapToken) {
+            alert('Token pembayaran belum tersedia. Silakan kembali ke checkout untuk membuat ulang pesanan.');
+            return;
+        }
+
+        window.snap.pay(snapToken, {
+            onSuccess: function (result) {
+                console.log('Pembayaran berhasil', result);
+                window.location.reload();
+            },
+            onPending: function (result) {
+                console.log('Pembayaran tertunda', result);
+                window.location.reload();
+            },
+            onError: function (result) {
+                console.error('Pembayaran gagal', result);
+                alert('Pembayaran gagal. Silakan coba lagi.');
+            },
+            onClose: function () {
+                console.warn('Snap popup ditutup');
+            }
+        });
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

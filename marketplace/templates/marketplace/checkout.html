@@ -1,0 +1,648 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="bg-white rounded-3xl shadow-sm p-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-serif font-black text-charcoal mb-2">Checkout & Pengiriman</h1>
+            <p class="text-sm text-gray-500">Lengkapi detail alamat dan hitung ongkos kirim sebelum menyelesaikan pesanan.</p>
+        </div>
+
+        {% if items and has_items %}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-[#faf8f5] rounded-3xl p-6 border border-gray-100">
+                    <h2 class="text-sm uppercase tracking-[0.4em] text-gray-500 mb-4">Detail Pengiriman</h2>
+                    <form method="post" class="space-y-6">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="block">
+                                <span class="text-sm font-semibold text-gray-700">Nama Penerima</span>
+                                <input type="text" name="shipping_name" value="{{ shipping_name }}" placeholder="Nama lengkap penerima" required class="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 focus:border-charcoal focus:ring-0">
+                            </label>
+                            <label class="block">
+                                <span class="text-sm font-semibold text-gray-700">Nomor Telepon</span>
+                                <input type="text" name="nomor_telepon" placeholder="0812xxxx" required class="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 focus:border-charcoal focus:ring-0" value="{% if nomor_telepon and nomor_telepon != 'None' %}{{ nomor_telepon }}{% endif %}">
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <label class="block">
+        <span class="text-sm font-semibold text-gray-700">Provinsi</span>
+        <select id="province-select" name="province" class="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 focus:border-charcoal focus:ring-0 bg-white" required>
+            <option value="">Pilih Provinsi...</option>
+        </select>
+    </label>
+    <label class="block">
+        <span class="text-sm font-semibold text-gray-700">Kota / Kabupaten</span>
+        <select id="city-select" name="city_name" class="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 focus:border-charcoal focus:ring-0 bg-white" required disabled>
+            <option value="">Pilih Kota/Kabupaten...</option>
+        </select>
+    </label>
+</div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="block">
+                                <span class="text-sm font-semibold text-gray-700">Kecamatan</span>
+                                <input type="text" name="district" value="{{ district }}" placeholder="Kecamatan tujuan" required class="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 focus:border-charcoal focus:ring-0">
+                            </label>
+                            <label class="block">
+                                <span class="text-sm font-semibold text-gray-700">Kode Pos</span>
+                                <input type="text" name="postal_code" value="{{ postal_code|default:'' }}" placeholder="53111" required class="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 focus:border-charcoal focus:ring-0">
+                            </label>
+                        </div>
+
+                        <label class="block">
+                            <span class="text-sm font-semibold text-gray-700">Alamat Lengkap</span>
+                            <textarea name="address_full" rows="4" required class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 focus:border-charcoal focus:ring-0" placeholder="Jalan, nomor rumah, blok, dan detail lain">{{ address_full }}</textarea>
+                        </label>
+
+                        <label class="block">
+                            <span class="text-sm font-semibold text-gray-700">Alamat Detail (blok/kode unit)</span>
+                            <textarea name="shipping_address" rows="3" class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 focus:border-charcoal focus:ring-0" placeholder="Contoh: Blok A3 / No. 12">{{ shipping_address }}</textarea>
+                        </label>
+
+                        <div class="grid grid-cols-1 gap-4">
+                            <label class="block">
+                                <span class="text-sm font-semibold text-gray-700">Lokasi Peta</span>
+                                <div id="map" class="w-full rounded-3xl border border-gray-200 shadow-sm relative" style="height: 350px; min-height: 350px; z-index: 1;"></div>
+                            </label>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="block">
+                                    <span class="text-sm font-semibold text-gray-700">Latitude</span>
+                                    <input type="text" id="latitude" name="latitude" value="{{ latitude|default:'' }}" readonly class="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 text-gray-500 font-mono">
+                                </label>
+                                <label class="block">
+                                    <span class="text-sm font-semibold text-gray-700">Longitude</span>
+                                    <input type="text" id="longitude" name="longitude" value="{{ longitude|default:'' }}" readonly class="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 text-gray-500 font-mono">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4 mt-4">
+                           <button type="button" id="btn-hitunghongkir" class="w-full sm:w-auto bg-[#8c6239] hover:bg-[#754f35] text-white px-6 py-3 rounded-xl font-semibold transition">Hitung Ongkos Kirim</button>
+                            <button type="button" id="btn-bayar-pesanan" class="w-full sm:w-auto bg-charcoal hover:bg-[#111111] text-white px-6 py-3 rounded-xl font-semibold transition">Bayar & Selesaikan Pesanan</button>
+                        </div>
+                        <input type="hidden" name="process_order" value="1">
+
+                        <div id="shipping-options" class="mt-6"></div>
+                        {% if courier_rates %}
+                        <div class="mt-6 bg-white rounded-3xl border border-gray-100 p-6">
+                            <h3 class="text-base font-semibold text-charcoal mb-4">Pilihan Kurir</h3>
+                            <div class="space-y-3">
+                                {% for rate in courier_rates %}
+                                <label class="block rounded-2xl border border-gray-200 p-4 cursor-pointer hover:border-charcoal">
+                                    <input type="radio" name="selected_rate" value="{{ rate.courier }}||{{ rate.service }}||{{ rate.cost }}" class="mr-3" {% if forloop.first %}checked{% endif %}>
+                                    <span class="font-semibold text-charcoal">{{ rate.courier }} {{ rate.service }}</span>
+                                    <div class="text-sm text-gray-500 mt-1">{{ rate.description }}</div>
+                                    <div class="text-sm text-gray-600 mt-2">Tarif: Rp {{ rate.cost|intcomma }} • Estimasi: {{ rate.etd }}</div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if not courier_rates and request.POST.calculate_shipping %}
+                        <div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">Tidak ditemukan tarif kurir. Pastikan kota tujuan sesuai dan coba lagi.</div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <aside class="space-y-6">
+                <div class="bg-[#faf8f5] rounded-3xl p-6 border border-gray-100">
+                    <h2 class="text-sm uppercase tracking-[0.4em] text-gray-500 mb-4">Ringkasan Pesanan</h2>
+                    <div class="space-y-4 text-sm text-gray-600">
+                        {% for item in items %}
+                        <div class="flex justify-between">
+                            <span>{{ item.product.name }} x{{ item.quantity }}</span>
+                            <span>Rp {{ item.product.price|intcomma }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="border-t border-gray-200 pt-4 mt-4 text-sm text-gray-600 space-y-3">
+                        <div class="flex justify-between">
+                            <span>Subtotal</span>
+                            <span>Rp {{ total_price|intcomma }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Total Berat</span>
+                            <span>{{ total_weight }} gr</span>
+                        </div>
+                        {% if courier_rates and request.POST.process_order %}
+                        <div class="flex justify-between font-semibold text-charcoal">
+                            <span>Ongkir terpilih</span>
+                            <span>Rp {{ request.POST.shipping_cost|default:'0'|intcomma }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </aside>
+        </div>
+        {% else %}
+        <div class="bg-white rounded-3xl border border-dashed border-gray-200 p-12 text-center">
+            <h3 class="text-xl font-semibold mb-3">Keranjang kosong</h3>
+            <p class="text-sm text-gray-500 mb-6">Tambahkan produk ke keranjang lalu kembali ke halaman checkout.</p>
+            <a href="{% url 'katalog' %}" class="inline-block bg-charcoal text-white px-6 py-3 rounded-xl">Jelajahi Produk</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Dropdown Elements
+    const provinceSelect = document.getElementById('province-select');
+    const citySelect = document.getElementById('city-select');
+
+    // Menggunakan parseFloat agar jika data dari Django kosong, sistem tidak crash
+    const defaultLat = parseFloat("{{ latitude }}") || -7.4244;
+    const defaultLng = parseFloat("{{ longitude }}") || 109.2300;
+
+    // Inisialisasi Peta Leaflet
+    const map = L.map('map').setView([defaultLat, defaultLng], 13);
+
+    // Memuat Layer Ubin OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Tambahkan Marker utama yang bisa di-drag
+    const marker = L.marker([defaultLat, defaultLng], {draggable: true}).addTo(map);
+
+    // Fungsi sinkronisasi koordinat ke kolom input form
+    function updateInputs(lat, lng) {
+        document.getElementById('latitude').value = lat.toFixed(7);
+        document.getElementById('longitude').value = lng.toFixed(7);
+    }
+
+    // ✨ FUNGSI NORMALISASI NAMA WILAYAH UNTUK PENCOCOKAN DATA LOKAL
+    function normalizeRegionText(value) {
+        if (!value) return '';
+        return String(value)
+            .toLowerCase()
+            .replace(/kabupaten|kota|regency|provinsi|province|daerah|special|region|dki|di/g, '')
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim();
+    }
+
+    function normalizeCityName(cityName) {
+        if (!cityName) return '';
+        let raw = normalizeRegionText(cityName);
+
+        const aliasMap = {
+            'purwokerto': 'Banyumas',
+            'purwokerto selatan': 'Banyumas',
+            'purwokerto utara': 'Banyumas',
+            'purwokerto timur': 'Banyumas',
+            'purwokerto barat': 'Banyumas'
+        };
+
+        if (aliasMap[raw]) return aliasMap[raw];
+        if (raw.includes('purwokerto')) return 'Banyumas';
+        return raw.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    function matchCityOptionByName(cityName) {
+        if (!cityName) return null;
+        const normalizedTarget = normalizeRegionText(cityName);
+        for (let option of citySelect.options) {
+            const normalizedOption = normalizeRegionText(option.textContent);
+            if (!normalizedOption) continue;
+            if (normalizedOption.includes(normalizedTarget) || normalizedTarget.includes(normalizedOption)) {
+                return option.value;
+            }
+        }
+        return null;
+    }
+
+    function mapProvinceNameToLocal(stateName) {
+        const normalized = normalizeRegionText(stateName);
+        const aliases = {
+            'yogyakarta': 'DI Yogyakarta',
+            'jogja': 'DI Yogyakarta',
+            'jakarta': 'DKI Jakarta',
+            'jawa barat': 'Jawa Barat',
+            'jabar': 'Jawa Barat',
+            'jawa tengah': 'Jawa Tengah',
+            'jateng': 'Jawa Tengah',
+            'jawa timur': 'Jawa Timur',
+            'jatim': 'Jawa Timur',
+            'banten': 'Banten'
+        };
+        return aliases[normalized] || stateName;
+    }
+
+    // ✨ FUNGSI AJAX: Ambil Daftar Kota Berdasarkan Provinsi
+    function fetchCities(provinceId, selectedCityName = null) {
+        citySelect.disabled = true;
+        citySelect.innerHTML = '<option value="">Memuat kota...</option>';
+        
+        return fetch(`/marketplace/api/cities/?province_id=${provinceId}`)
+            .then(response => response.json())
+            .then(data => {
+                citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten...</option>';
+                if (data.success) {
+                    data.data.forEach(city => {
+                        let option = document.createElement('option');
+                        option.value = city.city_id; // Mengirimkan ID Angka ke backend
+                        option.textContent = `${city.type} ${city.city_name}`;
+                        citySelect.appendChild(option);
+                    });
+                    citySelect.disabled = false;
+
+                    // Jalankan auto-select jika dipicu oleh peta atau data reload awal
+                    if (selectedCityName) {
+                        const cleanedTarget = normalizeCityName(selectedCityName).toLowerCase();
+                        for (let option of citySelect.options) {
+                            if (option.textContent.toLowerCase().includes(cleanedTarget)) {
+                                citySelect.value = option.value;
+                                break;
+                            }
+                        }
+                    }
+                }
+            })
+            .catch(err => {
+                console.error('Gagal memuat kota:', err);
+                citySelect.innerHTML = '<option value="">Gagal memuat data kota</option>';
+            });
+    }
+
+    // ✨ EVENT LISTENER: Deteksi Perubahan Pilihan Provinsi Manual
+    provinceSelect.addEventListener('change', function () {
+        const provinceId = this.value;
+        if (provinceId) {
+            fetchCities(provinceId);
+        } else {
+            citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten...</option>';
+            citySelect.disabled = true;
+        }
+    });
+
+    // ✨ FUNGSI AJAX: Ambil Semua Provinsi saat Pertama Kali Halaman Dimuat
+    function initProvinces() {
+        fetch("{% url 'api_provinces' %}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    provinceSelect.innerHTML = '<option value="">Pilih Provinsi...</option>';
+                    data.data.forEach(prov => {
+                        let option = document.createElement('option');
+                        option.value = prov.province_id;
+                        option.textContent = prov.province;
+                        provinceSelect.appendChild(option);
+                    });
+
+                    // Cek ketersediaan data awal dari context Django (jika reload setelah hitung ongkir)
+                    const initialProvince = "{{ province|default:'' }}";
+                    const initialCity = "{{ city_name|default:'' }}";
+                    
+                    if (initialProvince && initialProvince !== 'None') {
+                        for (let option of provinceSelect.options) {
+                            if (option.textContent.toLowerCase().includes(initialProvince.toLowerCase())) {
+                                provinceSelect.value = option.value;
+                                fetchCities(option.value, initialCity);
+                                break;
+                            }
+                        }
+                    }
+                }
+            })
+            .catch(err => console.error('Gagal mengambil data provinsi:', err));
+    }
+
+    // ✨ INTEGRASI BARU: Autofill Alamat via Pin Peta Nominatim ke Dropdown
+    function autoFillAddress(lat, lng) {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+        
+        const originalProvPlaceholder = provinceSelect.options[0].textContent;
+        provinceSelect.options[0].textContent = "Mencari data wilayah dari peta...";
+        citySelect.options[0].textContent = "Menyelaraskan kota...";
+        citySelect.disabled = true;
+
+        document.getElementsByName('district')[0].value = "Memuat...";
+        document.getElementsByName('postal_code')[0].value = "Memuat...";
+
+        fetch(url, { headers: { 'User-Agent': 'KucadiSmartLiving-App' } })
+            .then(response => response.json())
+            .then(data => {
+                provinceSelect.options[0].textContent = originalProvPlaceholder;
+                citySelect.options[0].textContent = "Pilih Kota/Kabupaten...";
+
+                if (data && data.address) {
+                    const addr = data.address;
+                    const stateRaw = addr.state || addr.region || '';
+                    const cityRaw = addr.city || addr.regency || addr.municipality || addr.county || addr.village || '';
+
+                    let matchedProvinceId = null;
+                    for (let option of provinceSelect.options) {
+                        const optionText = normalizeRegionText(option.textContent);
+                        const normalizedState = normalizeRegionText(mapProvinceNameToLocal(stateRaw));
+                        if (optionText && normalizedState && (optionText.includes(normalizedState) || normalizedState.includes(optionText))) {
+                            matchedProvinceId = option.value;
+                            provinceSelect.value = matchedProvinceId;
+                            break;
+                        }
+                    }
+
+                    if (matchedProvinceId) {
+                        fetchCities(matchedProvinceId, cityRaw)
+                            .then(() => {
+                                const matchedCityId = matchCityOptionByName(cityRaw);
+                                if (matchedCityId) {
+                                    citySelect.value = matchedCityId;
+                                }
+                            });
+                    } else {
+                        citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten...</option>';
+                        citySelect.disabled = true;
+                    }
+
+                    document.getElementsByName('district')[0].value = addr.suburb || addr.district || addr.city_district || addr.village || '';
+                    document.getElementsByName('postal_code')[0].value = addr.postcode || '';
+                }
+            })
+            .catch(error => {
+                console.error('Gagal memuat alamat:', error);
+                provinceSelect.options[0].textContent = originalProvPlaceholder;
+                citySelect.options[0].textContent = "Pilih Kota/Kabupaten...";
+                document.getElementsByName('district')[0].value = "";
+                document.getElementsByName('postal_code')[0].value = "";
+            });
+    }
+
+    // Event handler saat pin digeser selesai
+    marker.on('dragend', function (event) {
+        const position = event.target.getLatLng();
+        updateInputs(position.lat, position.lng);
+        autoFillAddress(position.lat, position.lng);
+        marker.setLatLng(position).bindPopup('Lokasi Pengiriman Terpilih').openPopup();
+    });
+
+    // Event handler saat area peta diklik langsung
+    map.on('click', function (event) {
+        marker.setLatLng(event.latlng);
+        updateInputs(event.latlng.lat, event.latlng.lng);
+        autoFillAddress(event.latlng.lat, event.latlng.lng);
+        marker.bindPopup('Lokasi Pengiriman Terpilih').openPopup();
+    });
+
+    // Jalankan inisialisasi awal data provinsi saat halaman siap
+    updateInputs(defaultLat, defaultLng);
+    initProvinces();
+
+    // Force reset ukuran peta agar tidak bug akibat grid layout Tailwind
+    setTimeout(function() {
+        map.invalidateSize();
+    }, 400);
+
+    // Tambahkan handler AJAX untuk tombol Hitung Ongkos Kirim agar tidak me-reload halaman
+    const btnHitung = document.getElementById('btn-hitunghongkir');
+    const shippingOptionsDiv = document.getElementById('shipping-options');
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // ✨ Handler untuk tombol "Hitung Ongkos Kirim"
+    btnHitung.addEventListener('click', function (e) {
+        e.preventDefault();
+        const form = btnHitung.closest('form');
+        if (form && !form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        function normalizeValue(value) {
+            if (value === null || value === undefined || value === 'None') {
+                return '';
+            }
+            return String(value).trim();
+        }
+
+        // Ambil nilai form penting tanpa merusak isi kecamatan/kodepos
+        const cityValue = normalizeValue(citySelect.value);
+        const lat = normalizeValue(document.getElementById('latitude').value);
+        const lng = normalizeValue(document.getElementById('longitude').value);
+        const districtValue = normalizeValue(document.getElementsByName('district')[0].value);
+        const postalValue = normalizeValue(document.getElementsByName('postal_code')[0].value);
+
+        const payload = {
+            city_id: cityValue,
+            city_name: citySelect.options[citySelect.selectedIndex] ? normalizeValue(citySelect.options[citySelect.selectedIndex].text) : '',
+            latitude: lat,
+            longitude: lng,
+            district: districtValue,
+            postal_code: postalValue
+        };
+
+        shippingOptionsDiv.innerHTML = '<div class="p-4 text-sm text-gray-500">Memeriksa tarif kurir...</div>';
+
+        fetch(window.location.pathname, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (!data || !data.success) {
+                shippingOptionsDiv.innerHTML = '<div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">Gagal memuat tarif kurir.</div>';
+                return;
+            }
+
+            // Jika server mengembalikan rates, render ke dalam shippingOptionsDiv tanpa menimpa form lain
+            const rates = data.rates || [];
+            if (rates.length === 0) {
+                shippingOptionsDiv.innerHTML = '<div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">Tidak ditemukan tarif kurir.</div>';
+                return;
+            }
+
+            let html = '<div class="mt-6 bg-white rounded-3xl border border-gray-100 p-6">';
+            html += '<h3 class="text-base font-semibold text-charcoal mb-4">Pilihan Kurir</h3>';
+            html += '<div class="space-y-3">';
+            rates.forEach(rate => {
+                const radioVal = `${rate.courier}||${rate.service}||${rate.cost}`;
+                html += `<label class="block rounded-2xl border border-gray-200 p-4 cursor-pointer hover:border-charcoal">`;
+                html += `<input type="radio" name="selected_rate" value="${radioVal}" class="mr-3">`;
+                html += `<span class="font-semibold text-charcoal">${rate.courier} ${rate.service}</span>`;
+                html += `<div class="text-sm text-gray-500 mt-1">${rate.description}</div>`;
+                html += `<div class="text-sm text-gray-600 mt-2">Tarif: Rp ${rate.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} • Estimasi: ${rate.etd}</div>`;
+                html += `</label>`;
+            });
+            html += '</div></div>';
+
+            shippingOptionsDiv.innerHTML = html;
+        })
+        .catch(err => {
+            console.error('Error hitung ongkir:', err);
+            shippingOptionsDiv.innerHTML = '<div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">Terjadi kesalahan saat memanggil layanan ongkir.</div>';
+        });
+    });
+
+    // ✨ ==== HANDLER TOMBOL \"BAYAR & SELESAIKAN PESANAN\" (AJAX SUBMIT) ====
+    const btnBayar = document.getElementById('btn-bayar-pesanan');
+    if (btnBayar) {
+        btnBayar.addEventListener('click', async function (e) {
+            // 🔴 LANGKAH 1: Cegah default form submission (SANGAT PENTING!)
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('✅ Click event tertangkap, default behavior dicegah');
+
+            // 🟡 LANGKAH 2: Ambil referensi form
+            const form = btnBayar.closest('form');
+            if (!form) {
+                alert('Tidak menemukan form. Hubungi support.');
+                return;
+            }
+
+            // 🟡 LANGKAH 3: Validasi form HTML5 (required fields)
+            if (!form.checkValidity()) {
+                console.warn('⚠️ Form validation failed');
+                form.reportValidity();
+                return;
+            }
+
+            // 🟡 LANGKAH 4: Validasi spesifik - kurir sudah dipilih?
+            const selectedRateRadio = document.querySelector('input[name=\"selected_rate\"]:checked');
+            if (!selectedRateRadio) {
+                alert('❌ Silakan hitung ongkos kirim dan pilih kurir terlebih dahulu.');
+                return;
+            }
+            console.log('✅ Kurir terpilih:', selectedRateRadio.value);
+
+            // 🟡 LANGKAH 5: Set loading state pada tombol
+            btnBayar.disabled = true;
+            const originalText = btnBayar.textContent;
+            btnBayar.textContent = '⏳ Memproses...';
+            console.log('✅ Loading state aktif');
+
+            try {
+                // 🟡 LANGKAH 6: Kumpulkan semua data form
+                const formData = new FormData(form);
+                
+                // Pastikan field process_order ada
+                formData.append('process_order', '1');
+                
+                // Debug: Tampilkan semua field yang akan dikirim
+                console.log('📋 Data form yang dikirim:');
+                const debugFields = {};
+                for (let [key, value] of formData.entries()) {
+                    const displayVal = String(value).substring(0, 80);
+                    debugFields[key] = displayVal;
+                    if (key !== 'csrfmiddlewaretoken') {
+                        const status = displayVal.trim() ? '✓' : '❌ KOSONG';
+                        console.log(`  ${status} ${key}: "${displayVal}"`);
+                    }
+                }
+                console.log('📊 Debug FormData:', debugFields);
+
+                // 🟡 LANGKAH 7: AJAX POST ke backend
+                const csrfToken = getCookie('csrftoken');
+                console.log('🔐 CSRF Token:', csrfToken ? '✓ Ada' : '✗ MISSING!');
+                console.log('🚀 Mengirim POST ke:', window.location.pathname);
+
+                const response = await fetch(window.location.pathname, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'  // Hint ke Django ini AJAX
+                    },
+                    body: formData
+                });
+
+                console.log('📡 Response status:', response.status, response.statusText);
+
+                // 🟡 LANGKAH 8: Parse response JSON
+                const data = await response.json();
+                console.log('📦 Response data:', data);
+
+                // 🟡 LANGKAH 9: Handle response
+                if (data.success === true) {
+                    const snapToken = data.snap_token || null;
+                    const redirectUrl = data.redirect_url || (data.order_id ? `/order/${data.order_id}/` : '/cart/');
+
+                    if (snapToken && window.snap) {
+                        console.log('✅ Midtrans snap token diterima, membuka Snap popup');
+                        window.snap.pay(snapToken, {
+                            onSuccess: function (result) {
+                                console.log('✅ Pembayaran berhasil', result);
+                                window.location.href = redirectUrl;
+                            },
+                            onPending: function (result) {
+                                console.log('⏳ Pembayaran tertunda', result);
+                                window.location.href = redirectUrl;
+                            },
+                            onError: function (result) {
+                                console.error('❌ Error Midtrans:', result);
+                                alert('Pembayaran gagal. Silakan coba lagi.');
+                                btnBayar.disabled = false;
+                                btnBayar.textContent = originalText;
+                            },
+                            onClose: function () {
+                                console.warn('⚠️ Snap popup ditutup oleh pengguna');
+                                alert('Pembayaran dibatalkan. Anda dapat mencoba lagi.');
+                                btnBayar.disabled = false;
+                                btnBayar.textContent = originalText;
+                            }
+                        });
+                    } else {
+                        console.log('✅ Pesanan berhasil! Redirect ke:', redirectUrl);
+                        window.location.href = redirectUrl;
+                    }
+                } else if (data.success === false) {
+                    // Backend return success: false dengan error message
+                    console.error('❌ Backend error (400/404/500):', data.message);
+                    alert(`❌ Error: ${data.message || 'Terjadi kesalahan tidak diketahui'}`);
+                    
+                    // Restore button state agar user bisa retry
+                    btnBayar.disabled = false;
+                    btnBayar.textContent = originalText;
+                } else {
+                    // Unknown response format
+                    console.error('❌ Response format tidak dikenali:', data);
+                    alert('❌ Response dari server tidak valid. Cek browser console.');
+                    
+                    btnBayar.disabled = false;
+                    btnBayar.textContent = originalText;
+                }
+
+            } catch (error) {
+                // Network error atau parsing error
+                console.error('❌ AJAX Error:', error);
+                alert(`❌ Gagal: ${error.message}\n\nCek browser console untuk detail.`);
+                
+                // Restore button state
+                btnBayar.disabled = false;
+                btnBayar.textContent = originalText;
+            }
+        });
+    }
+});
+</script>
+
+{% if midtrans_client_key %}
+<script src="{% if midtrans_is_production %}https://app.midtrans.com/snap/snap.js{% else %}https://app.sandbox.midtrans.com/snap.js{% endif %}" data-client-key="{{ midtrans_client_key }}"></script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panduan Perakitan Mandiri{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-12">
+    <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+        <h1 class="text-2xl font-bold mb-6">Panduan Perakitan Mandiri</h1>
+        {% if panduan_list.exists %}
+        <div class="grid grid-cols-1 gap-6">
+            {% for panduan in panduan_list %}
+            <div class="rounded-3xl border border-gray-200 bg-gray-50 p-6">
+                <div class="mb-5">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-2">{{ panduan.nama_produk }}</h2>
+                    <p class="text-gray-600 text-sm">{{ panduan.deskripsi_singkat }}</p>
+                </div>
+                <div class="aspect-video overflow-hidden rounded-3xl border border-gray-200 shadow-sm">
+                    <iframe class="w-full h-full" src="{{ panduan.link_embed_youtube }}" title="Panduan {{ panduan.nama_produk }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="rounded-3xl border border-gray-200 bg-gray-50 p-8 text-center">
+            <p class="text-gray-700">Belum ada panduan perakitan yang tersedia. Silakan cek kembali nanti.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

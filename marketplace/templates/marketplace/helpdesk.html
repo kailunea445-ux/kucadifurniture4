@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Layanan Pelanggan - Helpdesk{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-6 py-10">
+    <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Layanan Pelanggan</h1>
+            <p class="mt-2 text-gray-600">Isi formulir berikut untuk menyampaikan keluhan atau pertanyaan. Tim kami akan menindaklanjutinya melalui email.</p>
+        </div>
+
+        {% if messages %}
+        <div class="space-y-3 mb-6">
+            {% for message in messages %}
+            <div class="rounded-2xl px-4 py-3 text-sm font-medium {% if message.tags == 'success' %}bg-green-50 text-green-800{% elif message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-blue-50 text-blue-800{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="grid gap-8 lg:grid-cols-2">
+            <div>
+                <form method="post" action="{% url 'helpdesk' %}">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        <label class="block">
+                            <span class="text-sm font-medium text-gray-700">Nama</span>
+                            <input type="text" name="name" required class="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-[#8c6239]">
+                        </label>
+
+                        <label class="block">
+                            <span class="text-sm font-medium text-gray-700">Email</span>
+                            <input type="email" name="email" required class="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-[#8c6239]">
+                        </label>
+
+                        <label class="block">
+                            <span class="text-sm font-medium text-gray-700">Nomor WhatsApp</span>
+                            <input type="text" name="phone_number" placeholder="Contoh: 08127592805 atau +6285725928057" class="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-[#8c6239]">
+                        </label>
+
+                        <label class="block">
+                            <span class="text-sm font-medium text-gray-700">Subjek</span>
+                            <input type="text" name="subject" required class="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-[#8c6239]">
+                        </label>
+
+                        <label class="block">
+                            <span class="text-sm font-medium text-gray-700">Pesan Keluhan</span>
+                            <textarea name="message" rows="6" required class="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-[#8c6239]"></textarea>
+                        </label>
+
+                        <button type="submit" class="w-full rounded-3xl bg-[#8c6239] text-white px-6 py-3 font-semibold hover:bg-[#754f35]">Kirim Keluhan</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="space-y-6">
+                <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-3">Hubungi lewat WhatsApp</h2>
+                    <p class="text-gray-600 mb-6">Klik tombol berikut untuk langsung membuka chat WhatsApp dengan tim Customer Service kami.</p>
+                    <a href="https://wa.me/6285725928057?text=Halo%20Kucadi%20Smart%20Living,%20saya%20ingin%20bertanya%20seputar%20pesanan%20saya..." target="_blank" rel="noopener noreferrer" class="inline-flex w-full items-center justify-center rounded-3xl bg-green-500 px-6 py-4 text-white font-semibold shadow-lg hover:bg-green-600">
+                        <i class="fab fa-whatsapp fa-fw mr-3"></i>
+                        Hubungi Customer Service via WhatsApp
+                    </a>
+                </div>
+
+                <div class="rounded-3xl border border-gray-200 bg-[#faf8f5] p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Info Bantuan</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li>🔹 Layanan pelanggan siap membantu jam 09.00–18.00.</li>
+                        <li>🔹 Gunakan form jika Anda ingin menyampaikan keluhan resmi.</li>
+                        <li>🔹 WhatsApp lebih cepat untuk pertanyaan singkat.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

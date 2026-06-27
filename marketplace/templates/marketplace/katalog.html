@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    {% if current_category %}
+    <section class="bg-[#f8f7f3] border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 md:px-12 py-8">
+            <div class="text-sm text-gray-500 uppercase tracking-widest mb-2">{{ category_breadcrumb }}</div>
+            <h1 class="text-3xl md:text-4xl font-black tracking-[0.24em] text-[#222222] leading-tight">{{ category_title }}</h1>
+            <p class="mt-3 max-w-2xl text-sm md:text-base text-neutral-600">{{ category_description }}</p>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if not current_category %}
+    <header class="relative w-full h-[80vh] overflow-hidden">
+        <img src="{% static 'marketplace/images/hero-furniture.jpg.png' %}" 
+             alt="Kucadi Premium Furniture" 
+             class="absolute inset-0 w-full h-full object-cover brightness-90 contrast-95">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
+        <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 h-full flex items-center">
+            <div class="text-white max-w-3xl">
+                <div class="text-xs uppercase tracking-[0.3em] font-semibold text-amber-200">DIRECT-TO-CONSUMER</div>
+                <h1 class="mt-4 text-4xl md:text-6xl font-serif font-black leading-tight">Furnitur Modular & Elegan — Dibuat Untuk Kehidupan Nyata</h1>
+                <p class="mt-4 text-sm md:text-base font-light text-amber-100/90">Desain kontemporer, bahan premium, dan sistem modular agar mudah dipasang serta tahan lama untuk setiap rumah.</p>
+                <div class="mt-8">
+                    <a href="#koleksi" class="inline-block bg-white text-[#222222] px-6 py-3 rounded-md font-semibold hover:bg-[#A37B5C] hover:text-white transition">JELAJAHI KOLEKSI</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="max-w-7xl mx-auto py-16 px-6 grid grid-cols-1 md:grid-cols-3 gap-10 border-b border-gray-200">
+        <div class="flex flex-col items-center text-center p-4">
+            <div class="w-16 h-16 bg-sand text-accent rounded-full flex items-center justify-center text-2xl mb-4 shadow-inner">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <h4 class="font-serif font-bold text-lg text-charcoal">Sistem Kemasan Modular</h4>
+            <p class="text-sm text-gray-500 mt-2 leading-relaxed">Dirancang modular agar praktis saat pengiriman kargo, mudah melewati pintu sempit, dan dipasang tanpa alat bantu rumit.</p>
+        </div>
+        <div class="flex flex-col items-center text-center p-4">
+            <div class="w-16 h-16 bg-sand text-accent rounded-full flex items-center justify-center text-2xl mb-4 shadow-inner">
+                <i class="fas fa-truck-ramp-box"></i>
+            </div>
+            <h4 class="font-serif font-bold text-lg text-charcoal">Integrasi Kargo Domestik</h4>
+            <p class="text-sm text-gray-500 mt-2 leading-relaxed">Sistem pengiriman real-time terotomatisasi khusus penanganan logistik barang berdimensi besar ke seluruh Indonesia.</p>
+        </div>
+        <div class="flex flex-col items-center text-center p-4">
+            <div class="w-16 h-16 bg-sand text-accent rounded-full flex items-center justify-center text-2xl mb-4 shadow-inner">
+                <i class="fas fa-shield-halved"></i>
+            </div>
+            <h4 class="font-serif font-bold text-lg text-charcoal">Proteksi Garansi Digital</h4>
+            <p class="text-sm text-gray-500 mt-2 leading-relaxed">Setiap pembelian otomatis mengaktifkan fitur perlindungan klaim e-warranty terintegrasi jika ditemukan cacat produksi.</p>
+        </div>
+    </section>
+    {% else %}
+    <section class="max-w-7xl mx-auto py-10 px-6">
+    </section>
+    {% endif %}
+
+    <section class="max-w-7xl mx-auto px-6 pt-12">
+        <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-2 h-6 bg-accent rounded-full"></div>
+                <h3 class="text-lg font-serif font-bold text-charcoal">Koleksi Desainer Kucadi</h3>
+            </div>
+            
+            <form method="GET" action="" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                {% if current_category %}
+                    <input type="hidden" name="category" value="{{ current_category }}">
+                {% endif %}
+
+                <div class="relative flex-1 md:flex-initial">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input 
+                        type="text" 
+                        name="q" 
+                        value="{{ request.GET.q|default:'' }}" 
+                        placeholder="Cari produk furnitur..." 
+                        class="w-full md:w-64 pl-9 pr-4 py-2.5 bg-cream border border-gray-200 rounded text-sm focus:outline-none focus:border-accent transition"
+                    >
+                </div>
+                
+                <select 
+                    name="sort" 
+                    onchange="this.form.submit()" 
+                    class="px-4 py-2.5 bg-cream border border-gray-200 rounded text-sm text-gray-600 focus:outline-none focus:border-accent cursor-pointer"
+                >
+                    <option value="">Urutkan Produk</option>
+                    <option value="harga_terendah" {% if request.GET.sort == 'harga_terendah' %}selected{% endif %}>Harga: Rendah ke Tinggi</option>
+                    <option value="harga_tertinggi" {% if request.GET.sort == 'harga_tertinggi' %}selected{% endif %}>Harga: Tinggi ke Rendah</option>
+                    <option value="terbaru" {% if request.GET.sort == 'terbaru' %}selected{% endif %}>Terbaru</option>
+                </select>
+            </form>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 md:px-12 py-16">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+            <div class="flex flex-col items-center">
+                <i class="fas fa-cubes text-3xl text-[#A37B5C]"></i>
+                <h4 class="mt-3 text-sm uppercase tracking-widest font-bold">Sistem Modular</h4>
+                <p class="mt-2 text-xs text-[#6b6b6b]">Mudah dipasang dan disesuaikan untuk setiap ruangan.</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <i class="fas fa-diamond text-3xl text-[#A37B5C]"></i>
+                <h4 class="mt-3 text-sm uppercase tracking-widest font-bold">Bahan Premium</h4>
+                <p class="mt-2 text-xs text-[#6b6b6b]">Kayu pilihan, finishing mewah untuk ketahanan jangka panjang.</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <i class="fas fa-truck text-3xl text-[#A37B5C]"></i>
+                <h4 class="mt-3 text-sm uppercase tracking-widest font-bold">Pengiriman Aman</h4>
+                <p class="mt-2 text-xs text-[#6b6b6b]">Pengiriman kargo khusus — aman dan terlacak hingga depan rumah.</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <i class="fas fa-shield-check text-3xl text-[#A37B5C]"></i>
+                <h4 class="mt-3 text-sm uppercase tracking-widest font-bold">Garansi Resmi</h4>
+                <p class="mt-2 text-xs text-[#6b6b6b]">Proteksi garansi digital untuk setiap pembelian.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="koleksi" class="max-w-7xl mx-auto px-6 md:px-12 py-6">
+        <div class="flex flex-wrap items-center gap-3 justify-start">
+            <a href="{% url 'katalog' %}" class="px-4 py-2 rounded-full text-sm font-semibold transition
+                {% if not current_category %} bg-[#222222] text-white {% else %} bg-[#F3EFE8] text-[#222222] hover:bg-gray-200 {% endif %}">Semua Koleksi</a>
+            {% for cat in categories %}
+                <a href="{% url 'katalog' %}?category={{ cat.slug }}" class="px-4 py-2 rounded-full text-sm font-medium transition
+                    {% if current_category == cat.slug %} bg-[#222222] text-white {% else %} bg-[#F3EFE8] text-[#222222] hover:bg-gray-200 {% endif %}">{{ cat.name }}</a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section id="katalog" class="max-w-7xl mx-auto px-6 py-12 pb-24">
+        {% if products %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-14">
+                {% for product in products %}
+                    <div class="group flex flex-col justify-between bg-white rounded-xl border border-gray-100 p-4 transition-all duration-300 hover:shadow-md">
+                        <div>
+                            <div class="relative h-72 bg-[#f9f7f2] rounded-lg flex items-center justify-center overflow-hidden border border-gray-50 transition duration-300 group-hover:bg-sand">
+                                {% if product.image %}
+                                    <a href="{% url 'product_detail' product.id %}" class="w-full h-full block">
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'product_detail' product.id %}" class="w-full h-full flex items-center justify-center">
+                                        <span class="text-gray-300 text-6xl font-serif transition-transform duration-500 group-hover:scale-110">🪑</span>
+                                    </a>
+                                {% endif %}
+                                
+                                <div class="absolute top-3 right-3 space-y-2">
+                                    {% if product.stock > 0 %}
+                                        <span class="bg-charcoal text-white text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 rounded shadow-sm block">
+                                            Stok: {{ product.stock }}
+                                        </span>
+                                    {% else %}
+                                        <span class="bg-red-600 text-white text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 rounded shadow-sm block">
+                                            Habis
+                                        </span>
+                                    {% endif %}
+
+                                    {% if user.is_authenticated %}
+                                        <button type="button" data-url="{% url 'toggle_wishlist' %}" data-product-id="{{ product.id }}" aria-pressed="{% if product.id in wishlisted_product_ids %}true{% else %}false{% endif %}" class="wishlist-toggle-btn w-10 h-10 rounded-full border border-white shadow-sm flex items-center justify-center transition duration-200 {% if product.id in wishlisted_product_ids %}bg-red-100 text-red-600{% else %}bg-white text-gray-400 hover:text-red-600{% endif %}">
+                                            <i class="{% if product.id in wishlisted_product_ids %}fas fa-heart{% else %}far fa-heart{% endif %}"></i>
+                                        </button>
+                                    {% else %}
+                                        <a href="{% url 'account_login' %}?next={% url 'product_detail' product.id %}" class="w-10 h-10 rounded-full border border-white shadow-sm bg-white text-gray-400 hover:text-red-600 flex items-center justify-center transition duration-200">
+                                            <i class="far fa-heart"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="mt-5">
+                                <h4 class="text-lg font-serif font-bold text-charcoal transition-colors duration-200 group-hover:text-accent">
+                                    <a href="{% url 'product_detail' product.id %}" class="hover:underline block">
+                                        {{ product.name }}
+                                    </a>
+                                </h4>
+                                <p class="text-gray-500 text-xs mt-1.5 leading-relaxed line-clamp-2">
+                                    {% if product.description %}
+                                        {{ product.description }}
+                                    {% else %}
+                                        <em class="text-gray-400 font-light">Edisi koleksi furnitur terbatas Kucadi dengan penanganan material khusus.</em>
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 my-4 bg-cream p-2.5 rounded border border-gray-50 text-center">
+                                <div>
+                                    <span class="block text-[10px] uppercase tracking-wider text-gray-400 font-medium">Spesifikasi Massa</span>
+                                    <span class="text-xs font-semibold text-gray-700">{{ product.weight }} kg</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[10px] uppercase tracking-wider text-gray-400 font-medium">Dimensi Volume</span>
+                                    <span class="text-xs font-semibold text-gray-700">{{ product.dimensions }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-2 border-t border-gray-100 pt-4">
+                            <div class="flex items-baseline justify-between mb-4">
+                                <span class="text-xs uppercase tracking-widest font-semibold text-gray-400">Harga Jual D2C</span>
+                                <span class="text-lg font-bold text-charcoal font-mono tracking-tight">
+                                    {% if product.formatted_price %}
+                                        {{ product.formatted_price }}
+                                    {% else %}
+                                        Rp{{ product.price }}
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-5 gap-2">
+                                {% if not request.user.is_superuser and not request.user.is_staff %}
+                                    <a href="{% url 'buy_now' product.id %}" class="col-span-4 bg-charcoal hover:bg-accent text-white text-xs uppercase tracking-widest font-bold py-3.5 rounded transition duration-200 flex items-center justify-center gap-2 shadow-sm">
+                                        <i class="fas fa-shopping-cart text-[10px]"></i> Beli Langsung
+                                    </a>
+                                {% else %}
+                                    <div class="col-span-4 flex items-center justify-center rounded border border-gray-200 bg-gray-50 text-center text-xs text-red-600 font-semibold py-3.5">
+                                        Akses Admin: Anda berada dalam mode pratinjau toko.
+                                    </div>
+                                {% endif %}
+
+                                <a href="{% url 'product_detail' product.id %}" class="col-span-1 border border-gray-200 hover:bg-sand text-charcoal rounded transition duration-200 flex items-center justify-center" title="Lihat Detail Produk">
+                                    <i class="fas fa-arrow-up-right-from-square text-xs"></i>
+                                </a>
+                            </div>
+
+                            <div class="mt-3.5 flex items-center justify-between text-[11px] text-gray-400">
+                                <span class="text-xs text-gray-500">Produk resmi Kucadi — kualitas premium, tampilan minimalis.</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="max-w-md mx-auto text-center py-20 bg-white border border-dashed border-gray-200 rounded-2xl px-6 shadow-sm">
+                <div class="w-16 h-16 bg-cream text-gray-300 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fas fa-couch"></i>
+                </div>
+                <h3 class="text-xl font-serif font-bold text-charcoal">Katalog Sedang Diperbarui</h3>
+                <p class="text-gray-500 text-sm mt-2 leading-relaxed">Saat ini tim pengrajin Kucadi sedang mendata stok unit produk premium terbaru ke dalam sistem.</p>
+                <a href="/admin" class="mt-6 inline-block bg-accent hover:bg-charcoal text-white text-xs uppercase tracking-widest font-bold px-6 py-3 rounded shadow transition duration-200">
+                    + Input Produk Lewat Admin
+                </a>
+            </div>
+        {% endif %}
+    </section>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.wishlist-toggle-btn').forEach(button => {
+            button.addEventListener('click', async function(event) {
+                event.preventDefault();
+                const url = this.dataset.url;
+                const productId = this.dataset.productId;
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: JSON.stringify({ product_id: productId })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        const icon = this.querySelector('i');
+                        if (data.liked) {
+                            this.classList.add('bg-red-100', 'text-red-600');
+                            if (icon) icon.className = 'fas fa-heart';
+                        } else {
+                            this.classList.remove('bg-red-100', 'text-red-600');
+                            if (icon) icon.className = 'far fa-heart';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Wishlist toggle failed', error);
+                }
+            });
+        });
+});
+</script>
+{% endblock %}

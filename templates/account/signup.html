@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load account %}
+
+{% block title %}Daftar Akun - Kucadi Furniture{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-20rem)] flex items-center justify-center px-6 py-16 bg-[#F9F6F0]">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-sm border border-neutral-100 p-8 md:p-10 transition-all duration-300">
+        
+        <div class="text-center mb-8">
+            <h2 class="font-serif font-black text-3xl text-[#232323] tracking-wide mb-2">Buat Akun Baru</h2>
+            <p class="text-xs text-neutral-500 font-light tracking-wide">
+                Sudah memiliki akun resmi Kucadi? 
+                <a href="{% url 'account_login' %}" class="text-[#8c6239] font-bold hover:underline">Masuk di sini</a>
+            </p>
+        </div>
+
+        <form class="signup space-y-5" id="signup_form" method="POST" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-4 font-medium space-y-1">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <p class="flex items-center gap-1">
+                            <i class="fas fa-exclamation-circle text-red-500"></i> {{ error }}
+                        </p>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <p class="flex items-center gap-1">
+                        <i class="fas fa-exclamation-circle text-red-500"></i> {{ error }}
+                    </p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="flex flex-col space-y-1.5">
+                <label for="id_email" class="text-[10px] font-black uppercase tracking-widest text-neutral-400">Alamat Email</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-neutral-400 text-xs">
+                        <i class="far fa-envelope"></i>
+                    </span>
+                    <input type="email" name="email" id="id_email" placeholder="nama@email.com" required
+                           value="{% if form.email.value %}{{ form.email.value }}{% endif %}"
+                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#8c6239] focus:ring-1 focus:ring-[#8c6239] transition placeholder-gray-300 text-neutral-800 font-medium">
+                </div>
+            </div>
+
+            <div class="flex flex-col space-y-1.5">
+                <label for="id_username" class="text-[10px] font-black uppercase tracking-widest text-neutral-400">Nama Pengguna (Username)</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-neutral-400 text-xs">
+                        <i class="far fa-user"></i>
+                    </span>
+                    <input type="text" name="username" id="id_username" placeholder="username_kamu" required
+                           value="{% if form.username.value %}{{ form.username.value }}{% endif %}"
+                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#8c6239] focus:ring-1 focus:ring-[#8c6239] transition placeholder-gray-300 text-neutral-800 font-medium">
+                </div>
+            </div>
+
+            <div class="flex flex-col space-y-1.5">
+                <label for="id_password1" class="text-[10px] font-black uppercase tracking-widest text-neutral-400">Kata Sandi</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-neutral-400 text-xs">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <input type="password" name="password1" id="id_password1" placeholder="••••••••" required
+                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#8c6239] focus:ring-1 focus:ring-[#8c6239] transition placeholder-gray-300 text-neutral-800">
+                </div>
+            </div>
+
+            <div class="flex flex-col space-y-1.5">
+                <label for="id_password2" class="text-[10px] font-black uppercase tracking-widest text-neutral-400">Ulangi Kata Sandi</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-neutral-400 text-xs">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <input type="password" name="password2" id="id_password2" placeholder="••••••••" required
+                           class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#8c6239] focus:ring-1 focus:ring-[#8c6239] transition placeholder-gray-300 text-neutral-800">
+                </div>
+            </div>
+
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+
+            <div class="pt-4">
+                <button type="submit" class="w-full bg-[#8c6239] hover:bg-[#754f35] text-white py-3.5 rounded-xl font-bold tracking-widest text-[11px] uppercase shadow-sm transition duration-200 ease-in-out transform active:scale-[0.98]">
+                    DAFTAR AKUN
+                </button>
+            </div>
+        </form>
+        
+    </div>
+</div>
+{% endblock %}

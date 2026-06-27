@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-serif font-black text-charcoal">Wishlist Saya</h1>
+            <p class="mt-2 text-sm text-gray-600">Produk favorit yang Anda simpan untuk dilihat kembali nanti.</p>
+        </div>
+        <a href="{% url 'katalog' %}" class="text-sm text-amber-700 hover:underline">Kembali ke Katalog</a>
+    </div>
+
+    {% if products %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for product in products %}
+                <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
+                    <div class="relative h-72 bg-[#f9f7f2]">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-gray-300 text-6xl">🪑</div>
+                        {% endif %}
+                        <button type="button" data-url="{% url 'toggle_wishlist' %}" data-product-id="{{ product.id }}" class="wishlist-toggle-btn absolute top-4 right-4 w-11 h-11 rounded-full bg-red-100 text-red-600 flex items-center justify-center border border-white shadow-lg transition duration-200 hover:bg-red-200">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <h2 class="text-xl font-semibold text-charcoal mb-2"><a href="{% url 'product_detail' product.id %}" class="hover:text-amber-700">{{ product.name }}</a></h2>
+                                <p class="text-sm text-gray-500 leading-relaxed line-clamp-2">{% if product.description %}{{ product.description }}{% else %}<em>Deskripsi produk belum tersedia.</em>{% endif %}</p>
+                            </div>
+                            {% if product.stock > 0 %}
+                                <span class="text-[10px] uppercase tracking-widest text-white bg-green-600 rounded-full px-3 py-1">Stok {{ product.stock }}</span>
+                            {% else %}
+                                <span class="text-[10px] uppercase tracking-widest text-white bg-red-600 rounded-full px-3 py-1">Habis</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-6 grid grid-cols-2 gap-4 text-sm text-gray-500 border-t border-gray-100 pt-4">
+                            <div>
+                                <span class="block text-[10px] uppercase tracking-wider">Berat</span>
+                                <span class="font-semibold text-gray-800">{{ product.weight }} kg</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] uppercase tracking-wider">Dimensi</span>
+                                <span class="font-semibold text-gray-800">{{ product.dimensions }}</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex items-center justify-between">
+                            <span class="text-lg font-bold text-charcoal tracking-tight">{{ product.formatted_price }}</span>
+                            <a href="{% url 'product_detail' product.id %}" class="inline-flex items-center justify-center rounded-full bg-charcoal text-white px-4 py-2 text-xs uppercase tracking-widest hover:bg-amber-700 transition">Lihat Produk</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="rounded-3xl border border-dashed border-gray-200 bg-white p-12 text-center shadow-sm">
+            <p class="text-sm text-gray-500">Wishlist Anda masih kosong.</p>
+            <h2 class="text-2xl font-semibold text-charcoal mt-4">Simpan produk favoritmu untuk dilihat nanti.</h2>
+            <a href="{% url 'katalog' %}" class="mt-8 inline-block bg-amber-700 text-white px-6 py-3 rounded-full font-semibold uppercase tracking-widest hover:bg-amber-800 transition">Jelajahi Katalog</a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.wishlist-toggle-btn').forEach(button => {
+        button.addEventListener('click', async function(event) {
+            event.preventDefault();
+            const url = this.dataset.url;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+                const data = await response.json();
+                if (data.success) {
+                    this.closest('div.relative')?.parentElement?.remove();
+                }
+            } catch (error) {
+                console.error('Wishlist action failed', error);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
